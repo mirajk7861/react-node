@@ -9,20 +9,50 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    name: Run Playwright Tests and Display Report
+
+    services:
+      mongo:
+        image: mongo:4.4
+        ports:
+          - 27017:27017
+
     steps:
-      - uses: actions/checkout@v3
-      - name: Install Node.js
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-            node-version: '18'
-      - run: npm ci
-      - run: npx playwright install --with-deps
-      - run: npx playwright test
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          cd backend && npm install
+          cd ../frontend && npm install
+          cd ..
+
+      - name: Start backend and frontend
+        run: |
+          npm install -g concurrently wait-on
+          concurrently \
+            "cd backend && npm start" \
+            "cd frontend && npm start" &
         env:
           CI: true
-      - name: Upload Test Artifacts
+
+      - name: Wait for frontend and backend to be ready
+        run: npx wait-on http://localhost:3000 http://localhost:5050
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright Tests
+        run: npx playwright test
+        env:
+          CI: true
+
+      - name: Upload Playwright Report
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-test-results
+          name: playwright-report
           path: playwright-report/
