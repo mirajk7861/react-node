@@ -58,20 +58,3 @@ test('login with invalid credentials', async ({ page }) => {
   // Assert that an error message is shown
   await expect(page.locator('text=Invalid username or password')).toBeVisible();
 });
-
-test.afterEach(async ({ page }) => {
-  const todo = new TodoPage(page);
-  const todosCount = await todo.todoList.count();
-  // Collect all todo texts first to avoid DOM detachment issues
-  const todoTexts = [];
-  for (let i = 0; i < todosCount; i++) {
-    const text = await todo.todoList.nth(i).textContent();
-    if (text) {
-      todoTexts.push(text.trim());
-    }
-  }
-  for (const text of todoTexts) {
-    console.log(`Deleting todo: ${text}`);
-    await todo.deleteTodo(text);
-  }
-});
