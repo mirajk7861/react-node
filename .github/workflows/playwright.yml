@@ -18,7 +18,7 @@ jobs:
             node-version: '18'
       - run: npm ci
       - run: npx playwright install --with-deps
-      - run: npx playwright test --headless
+      - run: HEADLESS=true npx playwright test
       - name: Upload Test Artifacts
         uses: actions/upload-artifact@v4
         with:
