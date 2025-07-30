@@ -7,7 +7,9 @@ export default defineConfig({
   reporter: 'html',
 
   use: {
-    headless: false,          // 👈 Show browser
+    headless: true,
+    viewport: { width: 1280, height: 720 },
+    ignoreHTTPSErrors: true,
     slowMo: 1000,
     trace: 'on-first-retry',
   },
